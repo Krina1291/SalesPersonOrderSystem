@@ -16,84 +16,107 @@ namespace SalesOrderClient
         static void Main(string[] args)
         {
             IDataAccess dao = new IDataAccess();
-            
 
             int choice;
-            Console.WriteLine("1. Add Orders\n2. Display Orders\n3.Exit");
-            Console.WriteLine("Enter the choice");
-            choice = int.Parse(Console.ReadLine());
-
-            switch (choice)
+            do
             {
-                case 1:
-                    Order order = new Order();
-                    
-                    string cname, spname;
-                    order.order_date = DateTime.Now.Date;
-                    //  Console.WriteLine("Enter Order date (ddmmyyyy");
-                    // date = Console.ReadLine();
-                    Console.WriteLine("Enter Order Amount:");
-                    order.Amount = int.Parse(Console.ReadLine());
-                    Console.WriteLine("Enter Customer Name:");
-                    cname = Console.ReadLine();
-                    Console.WriteLine("Enter Sales Person Name:");
-                    spname = Console.ReadLine();
-                    try
-                    {
-                        dao.AddOrder(order, cname, spname);
-                        Console.WriteLine("Order Details Added Successfully");
-                    }
-                    catch (InvalidOrderAmountException ex)
-                    {
-                        Console.WriteLine(ex.Message);
-                    }
-                    catch (InvalidCustomerNameException ex)
-                    {
-                        Console.WriteLine(ex.Message);
-                    }
-                    catch (InvalidSalesPersonNameException ex)
-                    {
-                        Console.WriteLine(ex.Message);
-                    }
-                    finally
-                    {
+               
+                Console.WriteLine("1. Add Orders\n2. Display Orders\n3.Exit");
+                Console.WriteLine("Enter the choice");
+                choice = int.Parse(Console.ReadLine());
+
+                switch (choice)
+                {
+                    case 1:
+                        Console.WriteLine("================== Add Order Form =================");
+                        Order order = new Order();
+
+                        string cname, spname;
+                        order.order_date = Convert.ToDateTime(DateTime.Now.ToString("dd-MM-yyyy"));
+                        Console.WriteLine("Enter Order Amount:");
+                        order.Amount = int.Parse(Console.ReadLine());
+                        Console.WriteLine("Enter Customer Name:");
+                        cname = Console.ReadLine();
+                        Console.WriteLine("Enter Sales Person Name:");
+                        spname = Console.ReadLine();
                         
-                    }
-                    break;
-                case 2:
-                    try
-                    {
-                        Console.Write("Enter SalesPerson Name:");
-                        string name = Console.ReadLine();
-                        var lstorders = dao.DisplayDetails(name);
-
-
-                        foreach (var e in lstorders)
+                        try
                         {
-                            Console.WriteLine($"{e.order_date}\t{e.Order_id}\t{e.Amount}\t{e.cust_id}\t{e.salesperson_id}");
+                            Console.WriteLine("Add Order?(Y/N)");
+                            string confirm = Console.ReadLine();
+                            if (confirm == "Y")
+                            {
+                                dao.AddOrder(order, cname, spname);
+                                Console.WriteLine("Order Details Added Successfully");
+                            }
+                            else
+                            {
+                                break;
+                            }
                         }
-                    }
-                    catch (InvalidSalesPersonNameException ex)
-                    {
-                        Console.WriteLine(ex.Message);
-                    }
-                    catch (NoOrdersFoundException ex)
-                    {
-                        Console.WriteLine(ex.Message);
-                    }
+                        catch (InvalidOrderAmountException ex)
+                        {
+                            Console.WriteLine(ex.Message);
+                            ErrorLogger.LogError(ex);
+                        }
+                        catch (InvalidCustomerNameException ex)
+                        {
+                            Console.WriteLine(ex.Message);
+                            ErrorLogger.LogError(ex);
+                        }
+                        catch (InvalidSalesPersonNameException ex)
+                        {
+                            Console.WriteLine(ex.Message);
+                            ErrorLogger.LogError(ex);
+                        }
+                        finally
+                        {
 
-                    break;
-                case 3:
-                    break;
-                default:
-                    break;
-            }
+                        }
+                        break;
+                    case 2:
+                        try
+                        {
+                            Console.WriteLine("================== Display Orders =================");
+                            Console.Write("Enter SalesPerson Name:");
+                            string name = Console.ReadLine();
+                            Console.WriteLine("Display?(Y/N)");
+                            string confirm = Console.ReadLine();
+                            if (confirm == "Y")
+                            {
+                                var lstorders = dao.DisplayDetails(name);
+                                foreach (var e in lstorders)
+                                {
+                                    Console.WriteLine($"{e.order_date}\t{e.Order_id}\t{e.Amount}\t{e.cust_id}\t{e.salesperson_id}");
+                                }
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                        catch (InvalidSalesPersonNameException ex)
+                        {
+                            Console.WriteLine(ex.Message);
+                            ErrorLogger.LogError(ex);
+                        }
+                        catch (NoOrdersFoundException ex)
+                        {
+                            Console.WriteLine(ex.Message);
+                            ErrorLogger.LogError(ex);
+                        }
+
+                        break;
+                    default:
+                        break;
+                }
+            } while (choice != 3);
         }
     }
 
     class IDataAccess
     {
-        public void AddOrder(Order order,string cname,string sname)
+        public void AddOrder(Order order, string cname, string sname)
         {
             var dbCtx = new ORDERDBEntities();
 
@@ -126,7 +149,7 @@ namespace SalesOrderClient
 
 
 
-            order.salesperson_id =  dbCtx.SalesPersons
+            order.salesperson_id = dbCtx.SalesPersons
                                      .Where(e => e.Name == sname)
                                      .Select(o => o.ID).FirstOrDefault();
 
@@ -141,8 +164,8 @@ namespace SalesOrderClient
         }
 
 
-       
-        public List<Order> DisplayDetails (string name)
+
+        public List<Order> DisplayDetails(string name)
         {
             var dbCtx = new ORDERDBEntities();
             var id = dbCtx.SalesPersons
@@ -162,9 +185,10 @@ namespace SalesOrderClient
             }
             else
             {
-                var result = dbCtx.Orders.Where(e=>e.salesperson_id==id).ToList();
+                var result = dbCtx.Orders.Where(e => e.salesperson_id == id).ToList();
                 return result;
             }
         }
     }
+
 }

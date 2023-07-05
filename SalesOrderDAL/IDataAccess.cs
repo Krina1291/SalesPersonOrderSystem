@@ -4,9 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SalesOrderEntities
+namespace SalesOrderDAL
 {
-    public class Class1
-    {
-    }
+    
+
 }

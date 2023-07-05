@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SalesOrderDAL
+namespace SalesOrderEntities
 {
     public class OrderDetails
     {
@@ -13,7 +13,7 @@ namespace SalesOrderDAL
         public string SalePersonName { get; set; }
         public double OrderAmount { get; set; }
 
-        OrderDetails(string orderdate,double orderamount, string custname, string salepname)
+        OrderDetails(string orderdate, double orderamount, string custname, string salepname)
         {
             this.OrderDate = orderdate;
             this.OrderAmount = orderamount;
